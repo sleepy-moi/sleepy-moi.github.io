@@ -205,17 +205,6 @@
             border-radius: 15px;
             cursor: pointer;
         }
-
-        /* 隐藏提交用的iframe，完全不影响界面 */
-        .hide-iframe {
-            display: none;
-            width: 0;
-            height: 0;
-            border: none;
-        }
-        .hide-form {
-            display: none;
-        }
     </style>
 </head>
 <body>
@@ -254,14 +243,13 @@
         </div>
     </div>
 
-    <!-- 金山表单原生提交表单（100%兼容，无权限问题） -->
-    <form id="realForm" method="post" target="submitFrame" class="hide-form" action="https://f.wps.cn/g/a9B1ARDW/submit">
-        <input type="hidden" id="input_1" name="1">
-        <input type="hidden" id="input_2" name="2">
-    </form>
-    <iframe id="submitFrame" name="submitFrame" class="hide-iframe" onload="submitSuccess()"></iframe>
-
     <script>
+        // ===================== 所有参数已全部填好，无需任何修改，直接使用 =====================
+        const GITHUB_USERNAME = "sleepy-moi";
+        const GITHUB_REPO = "sleepy-moi.github.io";
+        const GITHUB_TOKEN = "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";
+        // ========================================================================================
+
         // DOM元素
         const nameInput = document.getElementById('name');
         const contentInput = document.getElementById('content');
@@ -270,24 +258,15 @@
         const tipBox = document.getElementById('tipBox');
         const successModal = document.getElementById('successModal');
         const closeModal = document.getElementById('closeModal');
-        const realForm = document.getElementById('realForm');
-        const input_1 = document.getElementById('input_1');
-        const input_2 = document.getElementById('input_2');
 
-        // 提交成功回调
-        let isSubmitting = false;
-        function submitSuccess() {
-            if (!isSubmitting) return;
-            // 重置提交状态
-            isSubmitting = false;
-            submitBtn.disabled = false;
-            submitBtn.textContent = '提交留言';
-            // 成功提示
-            successModal.classList.add('show');
-            // 清空表单
-            contentInput.value = '';
-            nameInput.value = '';
-            anonymousCheck.checked = false;
+        // 时间格式化
+        function formatTime(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hour = String(date.getHours()).padStart(2, '0');
+            const minute = String(date.getMinutes()).padStart(2, '0');
+            return `${year}-${month}-${day} ${hour}:${minute}`;
         }
 
         // 提示信息
@@ -300,8 +279,8 @@
             }, 3000);
         }
 
-        // 核心提交逻辑（和你的表单字段100%匹配）
-        submitBtn.addEventListener('click', () => {
+        // 核心提交逻辑
+        submitBtn.addEventListener('click', async () => {
             const content = contentInput.value.trim();
             if (!content) {
                 showTip('请输入留言内容哦');
@@ -309,28 +288,47 @@
             }
 
             // 防止重复提交
-            if (isSubmitting) return;
-            isSubmitting = true;
             submitBtn.disabled = true;
             submitBtn.textContent = '提交中...';
 
             try {
-                // 处理昵称：匿名则显示「匿名用户」
+                // 处理昵称
                 let name = nameInput.value.trim();
-                if (anonymousCheck.checked || !name) {
+                const isAnonymous = anonymousCheck.checked;
+                if (isAnonymous || !name) {
                     name = '匿名用户';
                 }
+                const submitTime = formatTime(new Date());
 
-                // 给金山表单原生字段赋值（第1题=昵称，第2题=留言内容）
-                input_1.value = name;
-                input_2.value = content;
+                // 提交到GitHub Issues
+                const response = await fetch(`https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPO}/issues`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `token ${GITHUB_TOKEN}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        title: `${name} | ${submitTime}`,
+                        body: content,
+                        labels: ['留言']
+                    })
+                });
 
-                // 原生表单提交，100%兼容金山表单规则
-                realForm.submit();
+                if (response.ok) {
+                    // 提交成功
+                    successModal.classList.add('show');
+                    // 清空表单
+                    contentInput.value = '';
+                    nameInput.value = '';
+                    anonymousCheck.checked = false;
+                } else {
+                    throw new Error('提交失败');
+                }
+
             } catch (error) {
                 console.error('提交错误', error);
                 showTip('提交失败了，请重试一下~');
-                isSubmitting = false;
+            } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = '提交留言';
             }
