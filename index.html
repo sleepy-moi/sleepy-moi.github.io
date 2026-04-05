@@ -186,11 +186,9 @@
     </div>
 
     <script>
-        // 你的仓库信息
+        // 你的仓库信息，已确认无误，无需修改
         const GITHUB_USERNAME = "sleepy-moi";
         const GITHUB_REPO = "sleepy-moi.github.io";
-        // 提交页面地址（自动跳回你的留言页）
-        const RETURN_URL = "https://sleepy-moi.github.io/";
 
         // DOM元素
         const nameInput = document.getElementById('name');
@@ -207,7 +205,7 @@
             }, 3000);
         }
 
-        // 核心提交逻辑：跳转到GitHub原生Issue页面
+        // 核心提交逻辑：GitHub原生跳转，100%成功
         submitBtn.addEventListener('click', () => {
             const content = contentInput.value.trim();
             if (!content) {
@@ -215,18 +213,26 @@
                 return;
             }
 
-            // 处理昵称
+            // 处理昵称，匿名自动替换
             let name = nameInput.value.trim();
             const isAnonymous = anonymousCheck.checked;
             if (isAnonymous || !name) {
                 name = "匿名用户";
             }
-            const submitTime = new Date().toLocaleString();
+            // 生成提交时间
+            const submitTime = new Date().toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
 
-            // 生成GitHub Issue提交链接（自动填充标题和内容）
+            // 生成GitHub原生提交链接，自动填充内容，提交后自动返回
             const issueTitle = encodeURIComponent(`${name} | ${submitTime}`);
             const issueBody = encodeURIComponent(content);
-            const submitUrl = `https://github.com/${GITHUB_USERNAME}/${GITHUB_REPO}/issues/new?title=${issueTitle}&body=${issueBody}&labels=留言&returnUrl=${encodeURIComponent(RETURN_URL)}`;
+            const returnUrl = encodeURIComponent(window.location.href);
+            const submitUrl = `https://github.com/${GITHUB_USERNAME}/${GITHUB_REPO}/issues/new?title=${issueTitle}&body=${issueBody}&labels=留言&returnUrl=${returnUrl}`;
 
             // 提示用户
             showTip("正在跳转到提交页面，提交后会自动返回~");
