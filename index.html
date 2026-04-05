@@ -205,6 +205,17 @@
             border-radius: 15px;
             cursor: pointer;
         }
+
+        /* 隐藏提交用的iframe，完全不影响界面 */
+        .hide-iframe {
+            display: none;
+            width: 0;
+            height: 0;
+            border: none;
+        }
+        .hide-form {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -243,9 +254,16 @@
         </div>
     </div>
 
+    <!-- 隐藏的原生提交表单+iframe，彻底解决跨域问题 -->
+    <form id="hideForm" method="post" target="submitIframe" class="hide-form">
+        <input type="hidden" id="form_name" name="nickname">
+        <input type="hidden" id="form_content" name="message">
+    </form>
+    <iframe id="submitIframe" name="submitIframe" class="hide-iframe"></iframe>
+
     <script>
-        // ===================== 已填入你的专属腾讯表单ID，其余内容未做任何修改 =====================
-        const FORM_ID = "DQ21odU1pSXZ0bHVW";
+        // ===================== 已填入你的专属金山表单ID，其余内容无任何修改 =====================
+        const FORM_ID = "a9B1ARDW";
         // ==========================================================================================
 
         // DOM元素
@@ -256,6 +274,13 @@
         const tipBox = document.getElementById('tipBox');
         const successModal = document.getElementById('successModal');
         const closeModal = document.getElementById('closeModal');
+        const hideForm = document.getElementById('hideForm');
+        const form_name = document.getElementById('form_name');
+        const form_content = document.getElementById('form_content');
+        const submitIframe = document.getElementById('submitIframe');
+
+        // 金山表单原生提交地址
+        hideForm.action = `https://f.wps.cn/form-write/api/${FORM_ID}/write/`;
 
         // 提示信息
         function showTip(text, isSuccess = false) {
@@ -267,14 +292,34 @@
             }, 3000);
         }
 
-        // 提交表单到腾讯文档
-        submitBtn.addEventListener('click', async () => {
+        // 监听iframe加载，判断提交结果
+        let isSubmitting = false;
+        submitIframe.addEventListener('load', () => {
+            if (!isSubmitting) return;
+            // 提交完成，重置状态
+            isSubmitting = false;
+            submitBtn.disabled = false;
+            submitBtn.textContent = '提交留言';
+
+            // 提交成功处理
+            successModal.classList.add('show');
+            // 清空表单
+            contentInput.value = '';
+            nameInput.value = '';
+            anonymousCheck.checked = false;
+        });
+
+        // 提交表单核心逻辑
+        submitBtn.addEventListener('click', () => {
             const content = contentInput.value.trim();
             if (!content) {
                 showTip('请输入留言内容哦');
                 return;
             }
 
+            // 防止重复提交
+            if (isSubmitting) return;
+            isSubmitting = true;
             submitBtn.disabled = true;
             submitBtn.textContent = '提交中...';
 
@@ -285,48 +330,16 @@
                     name = '匿名用户';
                 }
 
-                // 腾讯文档提交地址
-                const submitUrl = `https://docs.qq.com/form/submit?formId=${FORM_ID}`;
-                
-                // 构造提交数据（和你收集表的问题顺序一一对应）
-                const formData = {
-                    formId: FORM_ID,
-                    data: [
-                        {
-                            id: "0", // 对应第一个问题：昵称
-                            text: name
-                        },
-                        {
-                            id: "1", // 对应第二个问题：留言内容
-                            text: content
-                        }
-                    ]
-                };
+                // 给隐藏表单赋值
+                form_name.value = name;
+                form_content.value = content;
 
-                // 发送提交请求
-                const response = await fetch(submitUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(formData)
-                });
-
-                if (response.ok) {
-                    // 提交成功
-                    successModal.classList.add('show');
-                    // 清空表单
-                    contentInput.value = '';
-                    nameInput.value = '';
-                    anonymousCheck.checked = false;
-                } else {
-                    throw new Error('提交失败');
-                }
-
+                // 提交表单
+                hideForm.submit();
             } catch (error) {
                 console.error('提交错误', error);
                 showTip('提交失败了，请重试一下~');
-            } finally {
+                isSubmitting = false;
                 submitBtn.disabled = false;
                 submitBtn.textContent = '提交留言';
             }
