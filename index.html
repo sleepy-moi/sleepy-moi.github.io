@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>想对我说的话</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            min-height: 100vh;
+            padding: 30px 20px;
+        }
+
+        .container {
+            max-width: 420px;
+            margin: 0 auto;
+        }
+
+        /* 头部标题 */
+        .header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 26px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #7f8c8d;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        /* 表单卡片 */
+        .card {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+
+        .form-item {
+            margin-bottom: 20px;
+        }
+
+        .form-item label {
+            display: block;
+            color: #34495e;
+            font-size: 14px;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 13px 18px;
+            border: 1px solid #e0e6ed;
+            border-radius: 18px;
+            font-size: 15px;
+            color: #2c3e50;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            border-color: #409eff;
+            box-shadow: 0 0 0 3px rgba(64, 158, 255, 0.1);
+        }
+
+        .form-textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 13px 18px;
+            border: 1px solid #e0e6ed;
+            border-radius: 18px;
+            font-size: 15px;
+            color: #2c3e50;
+            outline: none;
+            resize: vertical;
+            line-height: 1.6;
+            transition: all 0.3s ease;
+        }
+
+        .form-textarea:focus {
+            border-color: #409eff;
+            box-shadow: 0 0 0 3px rgba(64, 158, 255, 0.1);
+        }
+
+        /* 匿名选项 */
+        .anonymous-box {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-left: 4px;
+        }
+
+        .anonymous-box input {
+            width: 18px;
+            height: 18px;
+            margin-right: 8px;
+            accent-color: #409eff;
+        }
+
+        .anonymous-box label {
+            color: #7f8c8d;
+            font-size: 14px;
+            user-select: none;
+        }
+
+        /* 提交按钮 */
+        .submit-btn {
+            width: 100%;
+            padding: 14px 0;
+            background: linear-gradient(135deg, #409eff 0%, #66b1ff 100%);
+            color: #ffffff;
+            border: none;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(64, 158, 255, 0.3);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(64, 158, 255, 0.35);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* 提示信息 */
+        .tip-box {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 14px;
+            height: 20px;
+        }
+
+        .success-tip {
+            color: #67c23a;
+        }
+
+        .error-tip {
+            color: #f56c6c;
+        }
+
+        /* 成功弹窗 */
+        .success-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+        }
+
+        .success-modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #fff;
+            border-radius: 20px;
+            padding: 30px 25px;
+            text-align: center;
+            max-width: 300px;
+        }
+
+        .modal-content h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .modal-content p {
+            color: #7f8c8d;
+            margin-bottom: 20px;
+        }
+
+        .modal-btn {
+            padding: 10px 30px;
+            background: #409eff;
+            color: #fff;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部标题 -->
+        <div class="header">
+            <h1>💬 想对我说的话</h1>
+            <p>可以匿名告诉我你的想法、建议和小秘密</p>
+        </div>
+
+        <!-- 留言表单 -->
+        <div class="card">
+            <div class="form-item">
+                <label for="name">你的昵称</label>
+                <input type="text" id="name" class="form-input" placeholder="可选，匿名可不填">
+            </div>
+            <div class="form-item">
+                <label for="content">留言内容 *</label>
+                <textarea id="content" class="form-textarea" placeholder="在这里写下你想对我说的话吧~ 支持文字和表情😊" required></textarea>
+            </div>
+            <div class="anonymous-box">
+                <input type="checkbox" id="anonymous">
+                <label for="anonymous">匿名提交</label>
+            </div>
+            <button class="submit-btn" id="submitBtn">提交留言</button>
+            <div class="tip-box" id="tipBox"></div>
+        </div>
+    </div>
+
+    <!-- 成功弹窗 -->
+    <div class="success-modal" id="successModal">
+        <div class="modal-content">
+            <h3>提交成功！</h3>
+            <p>谢谢你的留言，我已经收到啦~</p>
+            <button class="modal-btn" id="closeModal">我知道了</button>
+        </div>
+    </div>
+
+    <script>
+        // ===================== 已填入你的专属腾讯表单ID，其余内容未做任何修改 =====================
+        const FORM_ID = "DQ21odU1pSXZ0bHVW";
+        // ==========================================================================================
+
+        // DOM元素
+        const nameInput = document.getElementById('name');
+        const contentInput = document.getElementById('content');
+        const anonymousCheck = document.getElementById('anonymous');
+        const submitBtn = document.getElementById('submitBtn');
+        const tipBox = document.getElementById('tipBox');
+        const successModal = document.getElementById('successModal');
+        const closeModal = document.getElementById('closeModal');
+
+        // 提示信息
+        function showTip(text, isSuccess = false) {
+            tipBox.textContent = text;
+            tipBox.className = isSuccess ? 'tip-box success-tip' : 'tip-box error-tip';
+            setTimeout(() => {
+                tipBox.textContent = '';
+                tipBox.className = 'tip-box';
+            }, 3000);
+        }
+
+        // 提交表单到腾讯文档
+        submitBtn.addEventListener('click', async () => {
+            const content = contentInput.value.trim();
+            if (!content) {
+                showTip('请输入留言内容哦');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = '提交中...';
+
+            try {
+                // 处理昵称：匿名则显示「匿名用户」
+                let name = nameInput.value.trim();
+                if (anonymousCheck.checked || !name) {
+                    name = '匿名用户';
+                }
+
+                // 腾讯文档提交地址
+                const submitUrl = `https://docs.qq.com/form/submit?formId=${FORM_ID}`;
+                
+                // 构造提交数据（和你收集表的问题顺序一一对应）
+                const formData = {
+                    formId: FORM_ID,
+                    data: [
+                        {
+                            id: "0", // 对应第一个问题：昵称
+                            text: name
+                        },
+                        {
+                            id: "1", // 对应第二个问题：留言内容
+                            text: content
+                        }
+                    ]
+                };
+
+                // 发送提交请求
+                const response = await fetch(submitUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    // 提交成功
+                    successModal.classList.add('show');
+                    // 清空表单
+                    contentInput.value = '';
+                    nameInput.value = '';
+                    anonymousCheck.checked = false;
+                } else {
+                    throw new Error('提交失败');
+                }
+
+            } catch (error) {
+                console.error('提交错误', error);
+                showTip('提交失败了，请重试一下~');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '提交留言';
+            }
+        });
+
+        // 关闭成功弹窗
+        closeModal.addEventListener('click', () => {
+            successModal.classList.remove('show');
+        });
+
+        // 点击弹窗背景关闭
+        successModal.addEventListener('click', (e) => {
+            if (e.target === successModal) {
+                successModal.classList.remove('show');
+            }
+        });
+
+        // Ctrl+回车快捷提交
+        contentInput.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') {
+                submitBtn.click();
+            }
+        });
+    </script>
+</body>
+</html>
