@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Q萌小豆😽</title>
-    <meta property="og:title" content="Q萌小豆😽">
+    <title>Q萌天才威😽</title>
+    <meta property="og:title" content="Q萌天才威😽">
     <meta property="og:image" content="https://cdn.jsdelivr.net/gh/sleepy-moi/sleepy-moi.github.io@main/IMG_20251024_180027.png">
-    <meta property="og:description" content="来和小豆一起玩五子棋吧~">
+    <meta property="og:description" content="来和天才威一起玩五子棋吧~">
     <style>
         * {
             margin: 0;
@@ -244,7 +244,6 @@
         .option-bubble:active {
             transform: scale(0.98);
         }
-        /* "不要"按钮全屏平移 */
         #optionNo.jumping {
             position: fixed !important;
             z-index: 99999 !important;
@@ -349,7 +348,7 @@
 </head>
 <body>
     <div class="wrap-container">
-        <div class="dialog-bubble" id="dialog">我是小豆~</div>
+        <div class="dialog-bubble" id="dialog">我是天才威~</div>
         <div class="img-placeholder" id="placeholder">
             <div class="loader"></div>
         </div>
@@ -384,14 +383,12 @@
         let dialog, optionContainer, optionYes, optionNo, clickTip, gameSelectContainer, gameSelectBtn, goBoardContainer, goBoard, gameStatus, restartBtn;
 
         function onImgLoadSuccess() {
-            console.log('小人图片加载成功');
             placeholder.style.display = 'none';
             characterContainer.style.display = 'block';
             initOtherFeatures();
         }
 
         function onImgLoadError() {
-            console.log('小人图片加载失败，显示备用状态');
             placeholder.innerHTML = '<span style="color:#ff4444;">图片加载失败，点击重试</span>';
             placeholder.style.cursor = 'pointer';
             placeholder.onclick = () => {
@@ -464,7 +461,6 @@
                 });
             }
 
-            // "不要"按钮在屏幕内平移
             function moveNoButton() {
                 const padding = 20;
                 const btnWidth = optionNo.offsetWidth;
@@ -547,7 +543,7 @@
                 }
 
                 currentPlayer = 2;
-                gameStatus.textContent = '小豆思考中...';
+                gameStatus.textContent = '天才威思考中...';
                 character.classList.add('thinking');
                 setTimeout(() => {
                     proAIMove(gapSize);
@@ -690,9 +686,9 @@
             function checkAIFinish(row, col) {
                 if (checkWin(row, col, 2)) {
                     gameOver = true;
-                    gameStatus.textContent = '小豆赢啦😆，再试试吧！';
+                    gameStatus.textContent = '天才威赢啦😆，再试试吧！';
                     restartBtn.style.display = 'block';
-                    showDialog('小豆赢啦~ 下次加油喔😜').then(() => {
+                    showDialog('天才威赢啦~ 下次加油喔😜').then(() => {
                         character.classList.add('win-ai');
                         setTimeout(() => {
                             character.classList.remove('win-ai');
@@ -773,12 +769,9 @@
                 });
             });
 
-            // 修改：下棋时点小人不会阻塞棋盘点击
             character.addEventListener('click', async function handleCharacterClick() {
                 if (isAnimating) return;
-                // 如果游戏已开始且没结束，点小人只做动画，不阻塞棋盘
                 if (isGameStarted && !gameOver) {
-                    // 游戏中小人只做一个小抖动，不影响棋盘
                     isAnimating = true;
                     await playAnimation('shake');
                     isAnimating = false;
@@ -790,7 +783,7 @@
                 clickCount++;
                 
                 if (clickCount === 1) {
-                    await showDialog('我是小豆~');
+                    await showDialog('我是天才威~');
                     await playAnimation('rotate-jump');
                     await hideDialog();
                     isAnimating = false;
