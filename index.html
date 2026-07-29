@@ -2,8 +2,11 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Q萌小豆😽</title>
+    <meta property="og:title" content="Q萌小豆😽">
+    <meta property="og:image" content="https://cdn.jsdelivr.net/gh/sleepy-moi/sleepy-moi.github.io@main/IMG_20251024_180027.png">
+    <meta property="og:description" content="来和小豆一起玩五子棋吧~">
     <style>
         * {
             margin: 0;
@@ -18,6 +21,14 @@
             min-height: 100vh;
             padding: 20px;
             font-family: "微软雅黑", sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+            overflow: hidden;
+            position: relative;
+            width: 100vw;
+            height: 100vh;
         }
         .wrap-container {
             position: relative;
@@ -29,6 +40,7 @@
             max-width: 600px;
             padding-top: 70px;
             gap: 15px;
+            z-index: 10;
         }
         .character-container {
             perspective: 1200px;
@@ -49,24 +61,23 @@
             height: 90px;
             margin: 0;
             padding: 0;
+            z-index: 20;
         }
-        /* 动画优化1：全局过渡+点击反馈 */
         .character-img {
             width: 100%;
             height: auto;
             cursor: pointer;
             border-radius: 16px;
             box-shadow: 0 8px 24px rgba(144, 202, 249, 0.2);
-            transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1); /* 平缓过渡 */
+            transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
             will-change: transform, box-shadow, filter;
             filter: drop-shadow(0 0 10px rgba(66, 165, 245, 0.3));
         }
         .character-img:active {
             animation: clickRipple 0.3s ease-out forwards;
-            box-shadow: 0 4px 8px rgba(66, 165, 245, 0.2); /* 按压阴影收缩 */
-            filter: drop-shadow(0 0 6px rgba(66, 165, 245, 0.4)); /* 点击光影增强 */
+            box-shadow: 0 4px 8px rgba(66, 165, 245, 0.2);
+            filter: drop-shadow(0 0 6px rgba(66, 165, 245, 0.4));
         }
-        /* 原有基础动画保留+优化 */
         .character-img.rotate-jump {
             animation: rotateJump 1s ease-in-out forwards;
         }
@@ -76,24 +87,19 @@
         .character-img.slow-shake {
             animation: slowShake 1s ease-in-out forwards;
         }
-        /* 动画优化2：思考专属动画 */
         .character-img.thinking {
             animation: think 2s ease-in-out infinite;
         }
-        /* 动画优化3：玩家获胜专属动画 */
         .character-img.win-player {
             animation: winPlayer 1.2s ease-in-out forwards;
         }
-        /* 动画优化4：AI获胜专属动画 */
         .character-img.win-ai {
             animation: winAI 1s ease-in-out forwards;
         }
-        /* 动画优化5：平局专属动画 */
         .character-img.draw {
             animation: drawAnim 1.2s ease-in-out forwards;
         }
 
-        /* 动画关键帧定义 */
         @keyframes rotateJump {
             0% { transform: rotateY(0deg) translateY(0); }
             50% { transform: rotateY(360deg) translateY(-35px); box-shadow: 0 12px 30px rgba(144, 202, 249, 0.4); }
@@ -114,7 +120,7 @@
         }
         @keyframes clickRipple {
             0% { transform: scale(1); }
-            50% { transform: scale(0.96); opacity: 0.9; } /* 按压收缩，更真实 */
+            50% { transform: scale(0.96); opacity: 0.9; }
             100% { transform: scale(1); }
         }
         @keyframes think {
@@ -123,28 +129,28 @@
                 filter: drop-shadow(0 0 10px rgba(66, 165, 245, 0.3));
             }
             50% { 
-                transform: translateY(-5px) rotateZ(2deg); /* 轻微点头+上抬，模拟思考 */
-                filter: drop-shadow(0 0 12px rgba(66, 165, 245, 0.4)); /* 呼吸光影 */
+                transform: translateY(-5px) rotateZ(2deg);
+                filter: drop-shadow(0 0 12px rgba(66, 165, 245, 0.4));
             }
         }
         @keyframes winPlayer {
             0% { transform: rotateY(0) translateY(0); }
-            50% { transform: rotateY(360deg) translateY(-40px); /* 跳得更高，突出庆祝感 */
+            50% { transform: rotateY(360deg) translateY(-40px);
                   box-shadow: 0 15px 30px rgba(66, 165, 245, 0.5);
                   filter: drop-shadow(0 0 15px rgba(66, 165, 245, 0.6)); }
             100% { transform: rotateY(360deg) translateY(0); }
         }
         @keyframes winAI {
             0%, 100% { transform: rotateZ(0) translateY(0); }
-            20% { transform: rotateZ(5deg) translateY(-10px); } /* 左右转+蹦跳，符合活泼人设 */
+            20% { transform: rotateZ(5deg) translateY(-10px); }
             40% { transform: rotateZ(-5deg) translateY(-10px); }
             60% { transform: rotateZ(5deg) translateY(-10px); }
             80% { transform: rotateZ(-5deg) translateY(-10px); }
         }
         @keyframes drawAnim {
             0%, 100% { transform: scale(1) rotateZ(0); }
-            20% { transform: scale(1.02) rotateZ(-3deg); } /* 轻微摇摆 */
-            40% { transform: scale(0.98) rotateZ(3deg); } /* 收缩模拟“无奈” */
+            20% { transform: scale(1.02) rotateZ(-3deg); }
+            40% { transform: scale(0.98) rotateZ(3deg); }
             60% { transform: scale(1.02) rotateZ(-3deg); }
             80% { transform: scale(0.98) rotateZ(3deg); }
         }
@@ -153,7 +159,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* 动画优化6：提示框同步动效 */
         .dialog-bubble {
             position: absolute;
             background: #e3f2fd;
@@ -165,11 +170,11 @@
             font-weight: 500;
             top: -35px;
             left: 50%;
-            transform: translateX(-50%) translateY(0); /* 初始位置 */
+            transform: translateX(-50%) translateY(0);
             z-index: 30;
             display: none;
             white-space: nowrap;
-            transition: opacity 0.3s ease, transform 0.3s ease; /* 同步过渡 */
+            transition: opacity 0.3s ease, transform 0.3s ease;
             opacity: 0;
         }
         .dialog-bubble::after {
@@ -181,19 +186,16 @@
             border: 8px solid transparent;
             border-top-color: #e3f2fd;
         }
-        /* 小人跳跃时，提示框同步上移 */
         .character-img.rotate-jump ~ .dialog-bubble,
         .character-img.win-player ~ .dialog-bubble,
         .character-img.win-ai ~ .dialog-bubble {
             transform: translateX(-50%) translateY(-5px);
         }
-        /* 提示框消失动画 */
         .dialog-bubble.hiding {
             opacity: 0;
             transform: translateX(-50%) translateY(-10px);
         }
 
-        /* 其他基础样式保留 */
         .img-placeholder {
             width: 100%;
             max-width: 400px;
@@ -219,6 +221,8 @@
             gap: 20px;
             display: none;
             margin-top: 30px;
+            position: relative;
+            z-index: 50;
         }
         .option-bubble {
             background: #e3f2fd;
@@ -229,6 +233,9 @@
             cursor: pointer;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             transition: all 0.2s ease;
+            position: relative;
+            white-space: nowrap;
+            z-index: 50;
         }
         .option-bubble:hover {
             background: #bbdefb;
@@ -236,6 +243,13 @@
         }
         .option-bubble:active {
             transform: scale(0.98);
+        }
+        /* "不要"按钮全屏平移 */
+        #optionNo.jumping {
+            position: fixed !important;
+            z-index: 99999 !important;
+            transition: left 0.3s ease-out, top 0.3s ease-out !important;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2) !important;
         }
         .game-select-container {
             display: none;
@@ -332,7 +346,6 @@
             background-color: #2196f3;
         }
     </style>
-    <link rel="preload" href="https://pic1.imgdb.cn/i/033xzwaKpY7OFJIVG7DBJ9.png" as="image" crossorigin>
 </head>
 <body>
     <div class="wrap-container">
@@ -342,7 +355,7 @@
         </div>
         <div class="character-container" id="characterContainer">
             <img 
-                src="https://i.imgs.ovh/2025/10/24/7d1Zbq.png" 
+                src="https://cdn.jsdelivr.net/gh/sleepy-moi/sleepy-moi.github.io@main/IMG_20251024_180027.png" 
                 alt="3D Q萌恶魔小人" 
                 class="character-img" 
                 id="character"
@@ -383,7 +396,7 @@
             placeholder.style.cursor = 'pointer';
             placeholder.onclick = () => {
                 placeholder.innerHTML = '<div class="loader"></div>';
-                character.src = 'https://i.imgs.ovh/2025/10/24/7d1Zbq.png?' + new Date().getTime();
+                character.src = 'https://cdn.jsdelivr.net/gh/sleepy-moi/sleepy-moi.github.io@main/IMG_20251024_180027.png?' + new Date().getTime();
             };
         }
 
@@ -402,23 +415,24 @@
 
             let isAnimating = false;
             let clickCount = 0;
-            let isOptionStage = false;
-            let hasCompletedIntro = false;
             let isGameStarted = false;
+            let isOptionStage = false;
             const BOARD_SIZE = 15;
             let board = Array(BOARD_SIZE).fill().map(() => Array(BOARD_SIZE).fill(0));
             let currentPlayer = 1;
             let gameOver = false;
-            let dialogTimer = null; // 管理提示框定时消失
+            let dialogTimer = null;
 
-            // 动画播放函数（兼容新动画类）
             function playAnimation(animationClass) {
                 return new Promise((resolve) => {
-                    // 清除所有可能的动画类，避免冲突
                     character.classList.remove('rotate-jump', 'shake', 'slow-shake', 'thinking', 'win-player', 'win-ai', 'draw');
-                    character.offsetHeight; // 强制重绘
+                    character.offsetHeight;
                     character.classList.add(animationClass);
-                    const duration = animationClass === 'slow-shake' ? 1000 : (animationClass === 'win-player' ? 1200 : 500);
+                    let duration = 500;
+                    if (animationClass === 'slow-shake') duration = 1000;
+                    if (animationClass === 'win-player') duration = 1200;
+                    if (animationClass === 'win-ai') duration = 1000;
+                    if (animationClass === 'draw') duration = 1200;
                     setTimeout(() => {
                         character.classList.remove(animationClass);
                         resolve();
@@ -426,7 +440,6 @@
                 });
             }
 
-            // 提示框显示（清除旧定时器）
             function showDialog(content) {
                 return new Promise((resolve) => {
                     if (dialogTimer) clearTimeout(dialogTimer);
@@ -439,24 +452,38 @@
                 });
             }
 
-            // 提示框消失（添加同步动画）
             function hideDialog() {
                 return new Promise((resolve) => {
                     dialog.classList.add('hiding');
                     setTimeout(() => {
                         dialog.classList.remove('hiding');
                         dialog.style.display = 'none';
+                        dialog.style.opacity = 0;
                         resolve();
                     }, 300);
                 });
             }
 
-            function hideOptionContainer() {
-                optionContainer.style.display = 'none';
+            // "不要"按钮在屏幕内平移
+            function moveNoButton() {
+                const padding = 20;
+                const btnWidth = optionNo.offsetWidth;
+                const btnHeight = optionNo.offsetHeight;
+                const maxX = window.innerWidth - btnWidth - padding;
+                const maxY = window.innerHeight - btnHeight - padding;
+                const randomX = padding + Math.floor(Math.random() * (maxX - padding));
+                const randomY = padding + Math.floor(Math.random() * (maxY - padding));
+                
+                optionNo.classList.add('jumping');
+                optionNo.style.left = randomX + 'px';
+                optionNo.style.top = randomY + 'px';
             }
 
-            function hideGameSelectContainer() {
-                gameSelectContainer.style.display = 'none';
+            function resetNoButton() {
+                optionNo.classList.remove('jumping');
+                optionNo.style.left = '';
+                optionNo.style.top = '';
+                optionNo.style.position = '';
             }
 
             function initBoard() {
@@ -470,7 +497,6 @@
                 goBoard.addEventListener('click', handleBoardClick);
             }
 
-            // 玩家落子逻辑（文本修改+思考动画+获胜动画）
             function handleBoardClick(e) {
                 if (isAnimating || gameOver || currentPlayer !== 1) return;
 
@@ -490,49 +516,45 @@
                 board[row][col] = 1;
                 placePiece(row, col, 1, gapSize);
 
-                // 玩家获胜：专属动画+2秒消失
                 if (checkWin(row, col, 1)) {
                     gameOver = true;
                     gameStatus.textContent = '恭喜你获胜！🎉';
                     restartBtn.style.display = 'block';
                     showDialog('哇，你好厉害！😮').then(() => {
-                        character.classList.add('win-player'); // 玩家获胜动画
+                        character.classList.add('win-player');
                         setTimeout(() => {
                             character.classList.remove('win-player');
                             isAnimating = false;
-                            dialogTimer = setTimeout(() => hideDialog(), 2000); // 输赢提示2秒消失
+                            dialogTimer = setTimeout(() => hideDialog(), 2000);
                         }, 1200);
                     });
                     return;
                 }
 
-                // 平局：专属动画+2秒消失
                 if (checkDraw()) {
                     gameOver = true;
                     gameStatus.textContent = '平局啦~';
                     restartBtn.style.display = 'block';
                     showDialog('哎呀，平局了呢~').then(() => {
-                        character.classList.add('draw'); // 平局动画
+                        character.classList.add('draw');
                         setTimeout(() => {
                             character.classList.remove('draw');
                             isAnimating = false;
-                            dialogTimer = setTimeout(() => hideDialog(), 2000); // 输赢提示2秒消失
+                            dialogTimer = setTimeout(() => hideDialog(), 2000);
                         }, 1200);
                     });
                     return;
                 }
 
-                // 切换AI回合：文本修改为“小豆思考中...”+思考动画
                 currentPlayer = 2;
                 gameStatus.textContent = '小豆思考中...';
-                character.classList.add('thinking'); // 思考动画
+                character.classList.add('thinking');
                 setTimeout(() => {
                     proAIMove(gapSize);
-                    character.classList.remove('thinking'); // 思考结束移除动画
+                    character.classList.remove('thinking');
                 }, 1000);
             }
 
-            // 专业级AI落子逻辑（保留原功能）
             function proAIMove(gapSize) {
                 const SCORE = {
                     WIN: 1000000,    
@@ -660,44 +682,37 @@
                 if (board[bestPos.row][bestPos.col] === 0) {
                     board[bestPos.row][bestPos.col] = 2;
                     placePiece(bestPos.row, bestPos.col, 2, gapSize);
-                    const aiType = checkChessType(bestPos.row, bestPos.col, 2);
-                    if (aiType >= SCORE.LIVE_THREE) {
-                        console.log('小豆主动形成活三/活四，以攻为守');
-                    }
                 }
 
                 checkAIFinish(bestPos.row, bestPos.col);
             }
 
-            // AI落子后判断（文本修改+AI获胜动画）
             function checkAIFinish(row, col) {
-                // AI获胜：文本修改+专属动画+2秒消失
                 if (checkWin(row, col, 2)) {
                     gameOver = true;
-                    gameStatus.textContent = '小豆赢啦😆，再试试吧！'; // 文本修改
+                    gameStatus.textContent = '小豆赢啦😆，再试试吧！';
                     restartBtn.style.display = 'block';
-                    showDialog('小豆赢啦~ 下次加油喔😜').then(() => { // 文本修改
-                        character.classList.add('win-ai'); // AI获胜动画
+                    showDialog('小豆赢啦~ 下次加油喔😜').then(() => {
+                        character.classList.add('win-ai');
                         setTimeout(() => {
                             character.classList.remove('win-ai');
                             isAnimating = false;
-                            dialogTimer = setTimeout(() => hideDialog(), 2000); // 输赢提示2秒消失
+                            dialogTimer = setTimeout(() => hideDialog(), 2000);
                         }, 1000);
                     });
                     return;
                 }
 
-                // 平局：专属动画+2秒消失
                 if (checkDraw()) {
                     gameOver = true;
                     gameStatus.textContent = '平局啦~';
                     restartBtn.style.display = 'block';
                     showDialog('哎呀，平局了呢~').then(() => {
-                        character.classList.add('draw'); // 平局动画
+                        character.classList.add('draw');
                         setTimeout(() => {
                             character.classList.remove('draw');
                             isAnimating = false;
-                            dialogTimer = setTimeout(() => hideDialog(), 2000); // 输赢提示2秒消失
+                            dialogTimer = setTimeout(() => hideDialog(), 2000);
                         }, 1200);
                     });
                     return;
@@ -708,7 +723,6 @@
                 isAnimating = false;
             }
 
-            // 落子函数（保留）
             function placePiece(row, col, player, gapSize) {
                 const piece = document.createElement('div');
                 piece.className = `go-piece ${player === 1 ? 'black' : 'white'}`;
@@ -717,7 +731,6 @@
                 goBoard.appendChild(piece);
             }
 
-            // 胜负判断（保留）
             function checkWin(row, col, player) {
                 const directions = [[0, 1], [1, 0], [1, 1], [1, -1]];
                 for (const [dr, dc] of directions) {
@@ -739,7 +752,6 @@
                 return false;
             }
 
-            // 平局判断（保留）
             function checkDraw() {
                 for (let row = 0; row < BOARD_SIZE; row++) {
                     for (let col = 0; col < BOARD_SIZE; col++) {
@@ -749,9 +761,93 @@
                 return true;
             }
 
-            // 重启按钮（文本1秒消失）
             restartBtn.addEventListener('click', () => {
                 if (isAnimating) return;
                 isAnimating = true;
                 if (dialogTimer) clearTimeout(dialogTimer);
-   
+                hideDialog().then(() => {
+                    initBoard();
+                    goBoardContainer.style.display = 'block';
+                    restartBtn.style.display = 'none';
+                    isAnimating = false;
+                });
+            });
+
+            // 修改：下棋时点小人不会阻塞棋盘点击
+            character.addEventListener('click', async function handleCharacterClick() {
+                if (isAnimating) return;
+                // 如果游戏已开始且没结束，点小人只做动画，不阻塞棋盘
+                if (isGameStarted && !gameOver) {
+                    // 游戏中小人只做一个小抖动，不影响棋盘
+                    isAnimating = true;
+                    await playAnimation('shake');
+                    isAnimating = false;
+                    return;
+                }
+                if (gameOver && isGameStarted) return;
+                
+                isAnimating = true;
+                clickCount++;
+                
+                if (clickCount === 1) {
+                    await showDialog('我是小豆~');
+                    await playAnimation('rotate-jump');
+                    await hideDialog();
+                    isAnimating = false;
+                    return;
+                }
+                
+                if (clickCount === 2) {
+                    await showDialog('想和我一起玩游戏吗？');
+                    await playAnimation('shake');
+                    optionContainer.style.display = 'flex';
+                    isOptionStage = true;
+                    clickTip.style.display = 'none';
+                    isAnimating = false;
+                    return;
+                }
+                
+                if (clickCount >= 3 && !isGameStarted && isOptionStage) {
+                    optionContainer.style.display = 'flex';
+                    isAnimating = false;
+                    return;
+                }
+            });
+
+            optionYes.addEventListener('click', async function() {
+                if (isAnimating) return;
+                isAnimating = true;
+                optionContainer.style.display = 'none';
+                isOptionStage = false;
+                resetNoButton();
+                await showDialog('那就选择一个游戏吧😊');
+                await playAnimation('rotate-jump');
+                await hideDialog();
+                gameSelectContainer.style.display = 'block';
+                isAnimating = false;
+            });
+
+            optionNo.addEventListener('click', async function(e) {
+                if (isAnimating) return;
+                e.preventDefault();
+                e.stopPropagation();
+                moveNoButton();
+            });
+
+            gameSelectBtn.addEventListener('click', async function() {
+                if (isAnimating) return;
+                isAnimating = true;
+                gameSelectContainer.style.display = 'none';
+                characterContainer.classList.add('mini');
+                initBoard();
+                goBoardContainer.style.display = 'block';
+                isGameStarted = true;
+                await showDialog('你先下吧，黑棋先行~');
+                await playAnimation('shake');
+                await hideDialog();
+                isAnimating = false;
+            });
+        }
+    </script>
+</body>
+</html>
